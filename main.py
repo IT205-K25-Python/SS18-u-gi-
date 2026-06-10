@@ -1,95 +1,108 @@
-inventory = [
-    {"id": "G01", "name": "Gạo tẻ", "quantity": 50},
-    {"id": "G02", "name": "Mì tôm", "quantity": 120}
-]
+def menu():
+    print("""
+===========================================
+        QUẢN LÝ KHO HÀNG - GROGERY STORE
+===========================================
+    1. Xem danh sách hàng tồn kho
+    2. Nhập thêm hàng hóa mới
+    3. Cập nhật lượng tồn kho
+    4. Thoát chương trình
+""")
 
-
-def show_inventory(inventory_list):
-    if len(inventory_list) == 0:
+def show_inventory (inventory):
+    if not inventory:
         print("Kho hàng hiện đang trống!")
         return
+    print(f"{'ID':<5}| {'Tên hàng hóa':<15}| {'Số lương tồn':<5}")
+    print("-----------------------------------------------")
+    for i, v in enumerate(inventory):
+        print(f"{v.get("id"):<5}| {v.get("name"):<15}| {v.get("quantity"):<5}")
 
-    print("\n" + "=" * 50)
-    print(f"{'ID':<10}{'Tên hàng hóa':<25}{'Số lượng'}")
-    print("=" * 50)
+    print("------------------------------------------------")
 
-    for item in inventory_list:
-        print(f"{item['id']:<10}{item['name']:<25}{item['quantity']}")
-
-    print("=" * 50)
-
-
-def add_item(inventory_list):
+def validate_input(prompt:str, type_input: str = "str"):
     while True:
-        item_id = input("Nhập ID hàng hóa: ").strip()
-        if item_id != "":
-            break
-        print("ID không được để trống!")
+        users_input = input(prompt)
 
-    while True:
-        item_name = input("Nhập tên hàng hóa: ").strip()
-        if item_name != "":
-            break
-        print("Tên hàng hóa không được để trống!")
+        if not users_input:
+            print("Dữ liệu không được trống!")
+            continue
 
+        if type_input == "int":
+            try:
+                value = int(users_input)
+                if value < 0:
+                    print("Số truyền vào khống được âm, phải là 1 số nguyên!")
+                    continue
+                return value
+            except ValueError:
+                print("Dữ liệu không hợp lệ!")
+                continue
+        return users_input
+
+def add_inventory (inventory):
+    if not inventory:
+        print("Kho hàng hiện đang trống!")
+        return
     while True:
-        try:
-            quantity = int(input("Nhập số lượng: "))
-            if quantity > 0:
+        input_id = validate_input("Nhập ID cần thêm: ")
+        for i, v in enumerate(inventory):
+            if input_id.upper() == v.get("id").upper():
+                print("Mã hàng đã tồn tại! vui lòng nhập lại")
                 break
-            print("Số lượng phải lớn hơn 0!")
-        except:
-            print("Vui lòng nhập số nguyên hợp lệ!")
-
-    inventory_list.append({
-        "id": item_id,
-        "name": item_name,
-        "quantity": quantity
-    })
-
-    print("Thêm hàng hóa vào kho thành công!")
-
-
-def update_quantity(inventory_list):
-    item_id = input("Nhập ID hàng hóa cần cập nhật: ").strip()
-
-    for item in inventory_list:
-        if item["id"] == item_id:
-            while True:
-                try:
-                    new_quantity = int(input("Nhập số lượng mới: "))
-                    if new_quantity > 0:
-                        item["quantity"] = new_quantity
-                        print("Cập nhật số lượng thành công!")
-                        return
-                    print("Số lượng phải lớn hơn 0!")
-                except:
-                    print("Vui lòng nhập số nguyên hợp lệ!")
-
-    print(f"Không tìm thấy hàng hóa có mã {item_id}!")
-
-
-while True:
-    print("\n" + "=" * 50)
-    print("       QUẢN LÝ KHO HÀNG - GROCERY STORE ")
-    print("=" * 50)
-    print("1. Xem danh sách hàng tồn kho")
-    print("2. Nhập thêm hàng hóa mới")
-    print("3. Cập nhật số lượng tồn kho")
-    print("4. Thoát chương trình")
-    print("=" * 50)
-
-    choice = input("Nhập lựa chọn của bạn: ")
-
-    match choice:
-        case "1":
-            show_inventory(inventory)
-        case "2":
-            add_item(inventory)
-        case "3":
-            update_quantity(inventory)
-        case "4":
-            print("Đã thoát chương trình!")
+        else:
             break
-        case _:
-            print("Lựa chọn không hợp lệ!")
+    input_name = validate_input("Nhập tên hàng: ")
+    input_quantity = validate_input("Nhập số lượng: ", "int")
+
+    new = {
+        'id': input_id, 'name': input_name, 'quantity': input_quantity
+    }
+
+    inventory.append(new)
+    print("Thêm hàng hóa vào kho thành công!")
+    return
+
+def update_inventory (inventory):
+    if not inventory:
+        print("Kho hàng hiện đang trống!")
+        return
+    input_id = validate_input("Nhập mã hàng cần cập nhật: ")
+    for i, v in enumerate(inventory):
+        if input_id.upper() == v.get("id").upper():
+            input_quantity = validate_input("Nhập số lượng cần cập nhật: ", "int")
+            v["quantity"] = input_quantity
+            print("Cập nhật số lượng thành công!")
+            return
+    else:
+        print(f"Không tìm thấy hàng hóa có mã {input_id}")
+        return
+
+def main():
+    inventory = [
+    {'id': 'G01', 'name': 'Gạo tẻ', 'quantity': 50},
+    {'id': 'G02', 'name': 'Mì tôm', 'quantity': 120}
+]
+
+    while True:
+        menu()
+
+        choice = input("Mời bạn nhập lựa chọn (1-4): ")
+
+        match choice:
+            case "1":
+                print("---- DANH SÁCH HÀNG TỒN KHO ----")
+                show_inventory (inventory)
+            case "2":
+                print('---- NHẬP HÀNG HÓA MỚI -----')
+                add_inventory (inventory)
+            case "3":
+                print("---- Cập nhật số lượng tồn kho ----")
+                update_inventory (inventory)
+            case "4":
+                print("Cảm on bạn đã sử dụng phần mềm!")
+                print("[Chương trình kết thúc]")
+                break
+            case _:
+                print("Lựa chọn không hợp lệ")
+main()
